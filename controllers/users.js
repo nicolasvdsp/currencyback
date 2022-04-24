@@ -1,15 +1,20 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-
-const userSchema = new Schema({
-    name: String,
-    email: String,
-    password: String,
-});
-const User = mongoose.model('User', userSchema);
+const User = require('../models/users');
 
 const getAll = (req, res, next) => {
-  res.send("respond with a resource");
+  User.find({"user": "Bob"}, (err, docs) => {
+    if (err) {
+      res.send(err);
+    }
+    res.json(
+      {
+        "status": 'User found!',
+        "data": {
+          "name": docs,
+        }
+      }
+    );
+  });
+ 
 };
 
 const create = (req, res, next) => {
