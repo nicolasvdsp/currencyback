@@ -18,6 +18,21 @@ const signup = async (req, res, next) => {
     });
 };
 
+const login = async (req, res, next) => {
+const user = await User.authenticate()(req.body.username, req.body.password).then(result => {
+    res.json({
+        "status": 'User found!',
+        "data": {
+            "user": result,
+        }
+
+});
+}).catch(err => {
+    res.send(err);
+    });
+    };
+
 module.exports = {
     signup,
+    login
 };
