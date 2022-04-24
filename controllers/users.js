@@ -17,28 +17,30 @@ const getAll = (req, res, next) => {
  
 };
 
-const create = (req, res, next) => {
-  let user = new User();
-    user.name = "John";
-    user.email = "email";
-    user.password = "password";
-    user.save((err, doc) => {
-        if (err) {
-            res.send(err);
-        }
-        res.json(
-            {
-                "status": 'User created!',
-                "data": {
-                    "name": doc,
-                }
-            }
-        );
-    });
-};
-    
+// const create = (req, res, next) => {
+//     console.log();
+//   let user = new User();
+//     user.name = req.body.name;
+//     user.email = req.body.email;
+//     user.password = req.body.password;
+//     user.save((err, doc) => {
+//         if (err) {
+//             res.send(err);
+//         }
+//         res.json(
+//             {
+//                 "status": 'User created!',
+//                 "data": {
+//                     "name": doc,
+//                 }
+//             }
+//         );
+//     });
+// };
+
+
 
 module.exports = {
   getAll,
-  create,
+//   create,
 };
