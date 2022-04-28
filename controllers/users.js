@@ -1,18 +1,26 @@
 const User = require('../models/users');
 
 const getAll = (req, res, next) => {
-  User.find({"user": "Bob"}, (err, docs) => {
+
+  User.find({}, (err, users) => {
     if (err) {
-      res.send(err);
+      res.json({
+        status: 'error',
+        message: err,
+      });
     }
-    res.json(
-      {
-        "status": 'User found!',
-        "data": {
-          "name": docs,
-        }
-      }
-    );
+    res.json({
+      status: 'success',
+      data: {
+        users: users.map((user) => {
+          return {
+            username: user.username,
+            email: user.email,
+            balance: user.balance,
+          };
+        }),
+      },
+    });
   });
  
 };
