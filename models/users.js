@@ -8,12 +8,14 @@ const User = new Schema({
         required: true,
         minlength: 6,
         maxlength: 255,
+        unique: true,
     },
     email: {
         type: String,
         required: true,
         minlength: 3,
         maxlength: 255,
+        unique: true,
     },
     password: {
         type: String,
@@ -33,5 +35,7 @@ const User = new Schema({
 
 });
 
+
+User.index({ username: 1, email: 1 }, { unique: true });
 
 module.exports = mongoose.model('User', User);
