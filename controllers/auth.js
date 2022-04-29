@@ -19,7 +19,7 @@ const signup = async (req, res, next) => {
             }
         });
     }).catch(err => {
-        res.send(err);
+        res.send(err.message);
     }
     );
 
