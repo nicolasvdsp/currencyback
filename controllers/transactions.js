@@ -1,12 +1,5 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-const transactionSchema = new Schema({
-    sender: String,
-    receiver: String,
-    amount: Number,
-    date: {type: Date, default: Date.now }
-})
-const Transaction = mongoose.model('Transaction', transactionSchema);
+const Transaction = require('../models/Transactions');
+
 
 const getAll = (req, res) => {
     Transaction.find((err, docs) => {
@@ -17,15 +10,20 @@ const getAll = (req, res) => {
                     "transactions": docs
                 }
             });
+        } else {
+            res.json({
+                "status": "error",
+                "message": "Could not load all the transactions"
+            });
         }
     })
 }    
 
 const create = (req, res) => {
     let transaction = new Transaction();
-    transaction.sender = "Aiden";
-    transaction.receiver = "Jesse";
-    transaction.amount = 3;
+    transaction.sender = req.body.sender;
+    transaction.receiver = req.body.receiver;
+    transaction.amount = req.body.amount;
     transaction.save((err, doc) => {
         if(!err) {
             res.json({
@@ -33,6 +31,11 @@ const create = (req, res) => {
                 "data": {
                     "transaction": doc
                 }
+            });
+        } else {
+            res.json({
+                "status": "error",
+                "message": "Could not make the transaction"
             });
         }
     })
