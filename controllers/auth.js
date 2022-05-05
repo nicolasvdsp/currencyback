@@ -1,6 +1,7 @@
 const User = require('../models/users');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const config = require('../config/default.json');
 
 const signup = async (req, res, next) => {
 
@@ -66,7 +67,7 @@ const signup = async (req, res, next) => {
             }
         }
         else{
-            jwt.sign({ username: username, email: email, password: password }, '4ccdc24a90dcc77ec568b11f99fe9548987768557ef37b7d0d38ce3baebc4f4ae7b2be80df03184bfbd87f6e8384c4f67cc2664c85fc5ebae0556d76e3fd40fe', (err, token) => {
+            jwt.sign({ username: username, email: email, password: password }, config.config.jwt_secret, (err, token) => {
                 res.json({
                     status: 'success',
                     message: 'User created',
@@ -84,19 +85,55 @@ const signup = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
+
     //login users
     let username = req.body.username;
     let email = req.body.email;
     let password = req.body.password;
 
-    jwt.sign({ username: username, email: email, password: password }, '4ccdc24a90dcc77ec568b11f99fe9548987768557ef37b7d0d38ce3baebc4f4ae7b2be80df03184bfbd87f6e8384c4f67cc2664c85fc5ebae0556d76e3fd40fe', (err, token) => {
-        res.json({
-            "status": 'User logged in!',
-            "data": {
-                "token": token,
-            }
-        });
-    });
+   //check if username or email exists
+    User.findOne({ $or: [{ username: username }, { email: email }] }, (err, user) => {
+        if (err) {
+            res.json({
+                status: 'error',
+                message: err.message,
+            });
+        }
+        else if (!user) {
+            res.json({
+                status: 'error',
+                message: 'User does not exist',
+            });
+        }
+        else {
+            //check if password is correct
+            bcrypt.compare(password, user.password, (err, result) => {
+                if (err) {
+                    res.json({
+                        status: 'error',
+                        message: err.message,
+                    });
+                }
+                else if (result) {
+                    jwt.sign({ username: username, email: email, password: password }, config.config.jwt_secret, (err, token) => {
+                        res.json({
+                            status: 'success',
+                            message: 'User logged in',
+                            "data": {
+                                "token": token,
+                            }
+                        });
+                    });
+                }
+            });
+        }
+    }
+    );
+  
+
+
+
+
 
 };
 
