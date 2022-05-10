@@ -1,4 +1,5 @@
 const Transaction = require('../models/Transactions');
+const User = require('../models/Users');
 
 
 const getAll = (req, res) => {
@@ -24,8 +25,20 @@ const create = (req, res) => {
     transaction.sender = req.body.sender;
     transaction.receiver = req.body.receiver;
     transaction.amount = req.body.amount;
-    transaction.save((err, doc) => {
+    transaction.save(async (err, doc) => {
         if(!err) {
+            console.log(`receiver: ${transaction.receiver}`);
+            await User.updateOne(
+                { username: transaction.receiver },
+                { $inc: {balance: (transaction.amount)} }
+            );
+            
+            console.log(`sender: ${transaction.sender}`);
+            await User.updateOne(
+                { username: transaction.sender },
+                { $inc: {balance: -(transaction.amount)} }
+            );
+
             res.json({
                 "status": "success",
                 "data": {
@@ -39,6 +52,24 @@ const create = (req, res) => {
             });
         }
     })
+}
+
+//updateBalanceSender niet als aparte functie, (te beel php achtige code)
+//eerst met callbacks werken, nadien eventueel refactoren naar promises (await async)
+//increment kan je rechtstreeks in een User.update({username: sender} {balance $inc{....}}) iets in die aard doen
+
+let currentBalance;
+const updateBalanceSender = (sender, amount) => {
+    let newBalance;
+    User.find({username: sender}, (err, user) => {
+        User.update
+        currentBalance = user[0].balance;
+        newBalance = currentBalance + amount;
+        console.log(`${currentBalance} becomes ${newBalance}`);
+        user.balance = newBalance;
+        console.log(user);
+        res.send
+    });
 }
 
 module.exports = {
