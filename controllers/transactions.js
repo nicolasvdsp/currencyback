@@ -20,38 +20,37 @@ const getAll = (req, res) => {
     })
 }    
 
-const create = (req, res) => {
-    let transaction = new Transaction();
-    transaction.sender = req.body.sender;
-    transaction.receiver = req.body.receiver;
-    transaction.amount = req.body.amount;
-    transaction.save(async (err, doc) => {
-        if(!err) {
-            console.log(`receiver: ${transaction.receiver}`);
-            await User.updateOne(
-                { username: transaction.receiver },
-                { $inc: {balance: (transaction.amount)} }
-            );
-            
-            console.log(`sender: ${transaction.sender}`);
-            await User.updateOne(
-                { username: transaction.sender },
-                { $inc: {balance: -(transaction.amount)} }
-            );
+const create = async (req, res) => {
+    try {
+        let transaction = new Transaction();
+        transaction.sender = req.body.sender;
+        transaction.receiver = req.body.receiver;
+        transaction.amount = req.body.amount;
+        
+        const transactionSaved = await transaction.save();
 
-            res.json({
-                "status": "success",
-                "data": {
-                    "transaction": doc
-                }
-            });
-        } else {
-            res.json({
-                "status": "error",
-                "message": "Could not make the transaction"
-            });
-        }
-    })
+        await User.updateOne(
+            { username: transaction.receiver },
+            { $inc: {balance: (transaction.amount)} }
+        );
+        await User.updateOne(
+            { username: transaction.sender },
+            { $inc: {balance: -(transaction.amount)} }
+        );
+
+        res.json({
+            "status": "success",
+            "data": {
+                "transaction": transactionSaved
+            }
+        });
+
+    } catch {
+        res.json({
+            "status": "error",
+            "message": "Could not make the transaction"
+        });
+    }
 }
 
 //updateBalanceSender niet als aparte functie, (te beel php achtige code)
