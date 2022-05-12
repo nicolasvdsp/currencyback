@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const config = require('../config/default.json');
 
-const signup = async (req, res, next) => {
+const signup = async (req, res, next) => {  
     let username = req.body.username;
     let email = req.body.email;
     let password = req.body.password;
@@ -37,6 +37,13 @@ const signup = async (req, res, next) => {
             message: 'Email is invalid',
         });
     }
+    //check if username shorter than 6
+    if (username.length < 6) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'Username must be at least 6 characters',
+        });
+    }
 
 
     //hash password
@@ -51,6 +58,9 @@ const signup = async (req, res, next) => {
 
     //save user
     newUser.save((err, user) => {
+
+        
+
         if (err) {
             if(err.code===11000){
                 res.json({
@@ -92,40 +102,77 @@ const login = async (req, res, next) => {
 
    //check if username or email exists
     User.findOne({ $or: [{ username: username }, { email: email }] }, (err, user) => {
+        //check if theres an error
         if (err) {
             res.json({
                 status: 'error',
                 message: err.message,
             });
         }
+        //check if user exists
         else if (!user) {
             res.json({
                 status: 'error',
                 message: 'User does not exist',
             });
         }
-        else {
-            //check if password is correct
-            bcrypt.compare(password, user.password, (err, result) => {
-                if (err) {
-                    res.json({
-                        status: 'error',
-                        message: err.message,
-                    });
-                }
-                else if (result) {
-                    jwt.sign({ username: username, email: email, password: password }, config.config.jwt_secret, (err, token) => {
-                        res.json({
-                            status: 'success',
-                            message: 'User logged in',
-                            "data": {
-                                "token": token,
-                            }
-                        });
-                    });
-                }
+        //check if password is correct
+        else if (!bcrypt.compareSync(password, user.password)) {
+            res.json({
+                status: 'error',
+                message: 'Password is incorrect',
             });
         }
+        //login user
+        else {
+            jwt.sign({ username: username, email: email, password: password }, config.config.jwt_secret, (err, token) => {
+                res.json({
+                    status: 'success',
+                    message: 'User logged in',
+                    "data": {
+                        "token": token,
+                    }
+                });
+            }
+            );
+        }
+ 
+
+       
+        // if (err) {
+        //     res.status(400).json({
+        //         status: 'error',
+        //         message: err.message,
+        //     });
+        // }
+        // else if (!user) {
+        //     res.json({
+        //         status: 'error',
+        //         message: 'User does not exist',
+        //     });
+        // }
+        // else {
+        //     //check if password is correct
+        //     bcrypt.compare(password, user.password, (err, result) => {
+        //         if (err) {
+        //             res.json({
+        //                 status: 'error',
+        //                 message: err.message,
+        //             });
+        //         }
+        //         else if (result) {
+        //             jwt.sign({ username: username, email: email, password: password }, config.config.jwt_secret, (err, token) => {
+        //                 res.json({
+        //                     status: 'success',
+        //                     message: 'User logged in',
+        //                     "data": {
+        //                         "token": token,
+        //                     }
+        //                 });
+        //             });
+        //         }
+        //     });
+        // }
     }
     );
   
