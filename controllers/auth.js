@@ -4,7 +4,6 @@ const bcrypt = require('bcrypt');
 const config = require('../config/default.json');
 
 const signup = async (req, res, next) => {
-
     let username = req.body.username;
     let email = req.body.email;
     let password = req.body.password;
