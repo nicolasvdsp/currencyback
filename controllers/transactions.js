@@ -20,6 +20,26 @@ const getAll = (req, res) => {
     })
 }    
 
+const getOne = (req, res) => {
+    const id = req.params.id;
+
+    Transaction.find({ id: id }, (err, docs) => {
+        if(!err) {
+            res.json({
+                "status": "success",
+                "data": {
+                    "transactions": docs
+                }
+            });
+        } else {
+            res.json({
+                "status": "error",
+                "message": "Could not load your transaction"
+            })
+        }
+    })
+}
+
 const create = async (req, res) => {
     try {
         const amount = req.body.amount;
@@ -67,5 +87,6 @@ const create = async (req, res) => {
 
 module.exports = {
     getAll,
+    getOne,
     create
 }
