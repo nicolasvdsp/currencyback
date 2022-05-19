@@ -25,11 +25,32 @@ const getAll = (req, res, next) => {
  
 };
 
+const getAllByBalance = async (req, res) => {
+    try {
+        const result = await User.find().sort(
+            { balance: 'desc'}
+        );
+
+        res.json({
+            "status": "success",
+            "data": {
+                "users": result
+            }
+        });
+    } catch {
+        res.json({
+            status: 'error',
+            message: "couldn't get all users by balance",
+        });
+    } 
+}
+
 const signup = (req, res, next) => {
-  res.render('index', { title: 'Signup' });
+    res.render('index', { title: 'Signup' });
 };
 
 module.exports = {
-  getAll,
-  signup,
+    getAll,
+    signup,
+    getAllByBalance
 };
