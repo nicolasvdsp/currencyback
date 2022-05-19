@@ -77,6 +77,7 @@ const signup = async (req, res, next) => {
         }
         else{
             jwt.sign({ username: username, email: email, password: password }, config.config.jwt_secret, (err, token) => {
+                console.log(token);
                 res.json({
                     status: 'success',
                     message: 'User created',
@@ -94,6 +95,10 @@ const signup = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
+
+    let tokn = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imlqc2JlZXIiLCJlbWFpbCI6Imlqc2JlZXJAbGl2ZS5iZSIsInBhc3N3b3JkIjoiVGVzdDEyMzQiLCJpYXQiOjE2NTI5OTAzMDh9.x6q4meXQZfZiwQzP5kPVqRB_OT6zT-2rLsQOABRxPZw";
+    let decode = jwt.decode(tokn);
+    console.log(decode.username);
 
     //login users
     let username = req.body.username;
@@ -175,15 +180,17 @@ const login = async (req, res, next) => {
         // }
     }
     );
-  
-
-
-
-
-
 };
+
+const decodeToken = (token) => {
+    const regex = /[\w\.\d]+/g;
+    const match = token.match(regex)[1];
+
+    return jwt.decode(match);
+}
 
 module.exports = {
     signup,
-    login
+    login,
+    decodeToken
 };

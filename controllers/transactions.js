@@ -1,9 +1,14 @@
 const Transaction = require('../models/Transactions');
 const User = require('../models/Users');
+const auth = require('../controllers/auth')
   
 const getAll = async (req, res) => {
     try {
-        const result = await Transaction.find().sort(
+        const user = auth.decodeToken(req.body.token);
+
+        const result = await Transaction.find(
+            { username: user.username}
+        ).sort(
             { date: 'desc' }
         )
 
@@ -42,15 +47,17 @@ const getOne = async (req, res) => {
 
 const create = async (req, res) => {
     try {
+        const user = auth.decodeToken(req.body.token);
+
         const amount = req.body.amount;
         const sender = await User.find(
-            { username: req.body.sender}, 'balance'
+            { username: user.username}
         );
         const senderBalance = sender[0].balance;
         
         if(senderBalance >= amount) {
             let transaction = new Transaction();
-            transaction.sender = req.body.sender;
+            transaction.sender = user.username;
             transaction.receiver = req.body.receiver;
             transaction.amount = req.body.amount;
         
