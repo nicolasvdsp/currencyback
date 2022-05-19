@@ -1,43 +1,43 @@
 const Transaction = require('../models/Transactions');
 const User = require('../models/Users');
+  
+const getAll = async (req, res) => {
+    try {
+        const result = await Transaction.find().sort(
+            { date: 'desc' }
+        )
 
-
-const getAll = (req, res) => {
-    Transaction.find((err, docs) => {
-        if(!err){
-            res.json({
-                "status": "success",
-                "data": {
-                    "transactions": docs
-                }
-            });
-        } else {
-            res.json({
-                "status": "error",
-                "message": "Could not load all the transactions"
-            });
-        }
-    })
+        res.json({
+            "status": "success",
+            "data": {
+                "transactions": result
+            }
+        })
+    } catch {
+        res.json({
+            "status": "error",
+            "message": "Could not load all the transactions"
+        });
+    }
 }    
 
-const getOne = (req, res) => {
-    const id = req.params.id;
+const getOne = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const result = await Transaction.findById(id);
 
-    Transaction.find({ id: id }, (err, docs) => {
-        if(!err) {
-            res.json({
-                "status": "success",
-                "data": {
-                    "transactions": docs
-                }
-            });
-        } else {
-            res.json({
-                "status": "error",
-                "message": "Could not load your transaction"
-            })
-        }
-    })
+        res.json({
+            "status": "success",
+            "data": {
+                "transactions": result
+            }
+        });
+    } catch {
+        res.json({
+            "status": "error",
+            "message": "Could not load your transaction"
+        })
+    }
 }
 
 const create = async (req, res) => {
