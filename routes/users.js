@@ -7,6 +7,7 @@ const authController = require('../controllers/auth');
 router.get('/', userController.getAll);
 router.get('/getallbybalance', userController.getAllByBalance);
 
+router.post('/getUserByToken', authController.getUserByToken);
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
 module.exports = router;

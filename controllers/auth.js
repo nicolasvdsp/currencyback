@@ -95,11 +95,6 @@ const signup = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
-
-    let tokn = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imlqc2JlZXIiLCJlbWFpbCI6Imlqc2JlZXJAbGl2ZS5iZSIsInBhc3N3b3JkIjoiVGVzdDEyMzQiLCJpYXQiOjE2NTI5OTAzMDh9.x6q4meXQZfZiwQzP5kPVqRB_OT6zT-2rLsQOABRxPZw";
-    let decode = jwt.decode(tokn);
-    console.log(decode.username);
-
     //login users
     let username = req.body.username;
     let email = req.body.email;
@@ -182,6 +177,32 @@ const login = async (req, res, next) => {
     );
 };
 
+const getUserByToken = async (req, res) => {
+    try {
+        let cookie = req.body.token;
+        let token = decodeToken(cookie)
+
+        const user = await User.find(
+            {username: token.username}
+        );
+        const balance = user[0].balance;
+        const username = user[0].username;
+
+        res.json({
+            "status": "success",
+            "data": {
+                "user": username,
+                "balance": balance
+            }
+        })
+    } catch {
+        res.json({
+            "status": "error",
+            "message": "token is not valid"
+        })
+    }
+}
+
 const decodeToken = (token) => {
     const regex = /[\w\.\d]+/g;
     const match = token.match(regex)[1];
@@ -192,5 +213,6 @@ const decodeToken = (token) => {
 module.exports = {
     signup,
     login,
+    getUserByToken,
     decodeToken
 };
