@@ -7,7 +7,7 @@ const getAll = async (req, res) => {
         const user = auth.decodeToken(req.body.token);
 
         const result = await Transaction.find(
-            { username: user.username}
+            { $or: [{receiver: user.username}, {sender: user.username}]}
         ).sort(
             { date: 'desc' }
         )
@@ -47,8 +47,8 @@ const getOne = async (req, res) => {
 
 const create = async (req, res) => {
     try {
+        console.log(req.body.token);
         const user = auth.decodeToken(req.body.token);
-
         const amount = req.body.amount;
         const sender = await User.find(
             { username: user.username}
