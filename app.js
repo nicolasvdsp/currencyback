@@ -8,8 +8,12 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const transactionsRouter = require('./routes/transactions');
 
+//import config file
+const config = require('./config/default.json');
+const databasePwd = config.database['password:'];
+
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/currencyapp', { useNewUrlParser: true });
+mongoose.connect('mongodb+srv://ismailElg:'+databasePwd+'@cluster0.egvft.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true });
 
 var app = express();
 const cors = require('cors');
