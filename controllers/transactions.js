@@ -1,5 +1,5 @@
-const Transaction = require('../models/Transactions');
-const User = require('../models/Users');
+const Transaction = require('../models/transactions');
+const User = require('../models/users');
 const auth = require('../controllers/auth')
   
 const getAll = async (req, res) => {
